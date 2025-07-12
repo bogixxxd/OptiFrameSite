@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OptiFrame</title>
+<!-- Google Fonts: Poppins -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet" />
+<style>
+  /* Reset and base */
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  html, body {
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
+    background: #0a0f16;
+    overflow: hidden;
+    color: #0f0;
+    position: relative;
+  }
+  /* Container centering */
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  /* Loader styles */
+  #loader {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #0a0f16;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.7s ease;
+  }
+  #loader.fade-out {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Spinner */
+  .spinner {
+    width: 80px;
+    height: 80px;
+    border: 8px solid rgba(63, 255, 63, 0.3);
+    border-top-color: #3fff3f;
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite;
+    box-shadow:
+      0 0 10px #3fff3f88,
+      0 0 20px #3fff3fbb;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Animated background using CSS */
+  body::before {
+    content: "";
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+      radial-gradient(circle at 30% 30%, #0f0a, transparent 25%),
+      radial-gradient(circle at 70% 70%, #0f0a, transparent 25%);
+    animation: backgroundMove 15s linear infinite;
+    z-index: -3;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      repeating-conic-gradient(from 0deg, #0f0a 0deg 10deg, transparent 10deg 20deg);
+    opacity: 0.08;
+    animation: rotateBg 40s linear infinite;
+    z-index: -2;
+  }
+
+  @keyframes backgroundMove {
+    0% {
+      transform: rotate(0deg) translate(0, 0) scale(1);
+    }
+    50% {
+      transform: rotate(180deg) translate(30px, 30px) scale(1.05);
+    }
+    100% {
+      transform: rotate(360deg) translate(0, 0) scale(1);
+    }
+  }
+  @keyframes rotateBg {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Falling blocks container */
+  .falling-blocks {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: -1;
+  }
+
+  /* Single falling block */
+  .block {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    background: #064e03; /* dark green */
+    border-radius: 12px;
+    box-shadow:
+      0 0 15px 5px rgba(6, 78, 3, 0.9),
+      0 0 30px 10px rgba(6, 78, 3, 0.6);
+    opacity: 0.9;
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    filter: drop-shadow(0 0 6px #0b7305);
+  }
+
+  @keyframes fall {
+    0% {
+      transform: translateY(-30px);
+      opacity: 0.9;
+    }
+    90% {
+      opacity: 0.9;
+    }
+    100% {
+      transform: translateY(110vh);
+      opacity: 0;
+    }
+  }
+
+  /* Main content */
+  .container {
+    text-align: center;
+    z-index: 10;
+    user-select: none;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+  }
+  .container.visible {
+    opacity: 1;
+  }
+
+  h1 {
+    font-weight: 900;
+    font-size: 4rem;
+    color: #3fff3f;
+    text-shadow:
+      0 0 10px #3fff3f88,
+      0 0 30px #3fff3fbb;
+    margin-bottom: 2rem;
+    letter-spacing: 0.2em;
+    animation: glowPulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% {
+      text-shadow:
+        0 0 10px #3fff3f88,
+        0 0 30px #3fff3fbb;
+    }
+    50% {
+      text-shadow:
+        0 0 20px #3fff3fcc,
+        0 0 50px #3fff3fff;
+    }
+  }
+
+  /* Download button */
+  .btn-download {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #3fff3f;
+    background: transparent;
+    border: 2.5px solid #3fff3f;
+    border-radius: 10px;
+    padding: 1rem 3rem;
+    cursor: pointer;
+    box-shadow:
+      0 0 6px #3fff3faa,
+      0 0 20px #3fff3f88;
+    transition: 
+      box-shadow 0.3s ease,
+      color 0.3s ease,
+      transform 0.25s ease;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+  }
+  .btn-download:hover {
+    color: #00ff00;
+    box-shadow:
+      0 0 12px #00ff00cc,
+      0 0 40px #00ff0088,
+      0 0 80px #00ff0044;
+    transform: scale(1.05);
+  }
+  .btn-download:active {
+    transform: scale(0.98);
+  }
+
+  /* Small ripple effect on click */
+  .btn-download::after {
+    content: "";
+    position: absolute;
+    width: 120%;
+    height: 120%;
+    top: -10%;
+    left: -10%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #3fff3f33 10%, transparent 40%);
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+    transition: opacity 0.3s ease;
+  }
+  .btn-download:focus::after,
+  .btn-download:active::after {
+    opacity: 1;
+    transition: opacity 0.1s ease;
+  }
+</style>
+</head>
+<body>
+  <!-- Loader -->
+  <div id="loader" role="alert" aria-live="assertive" aria-label="Loading content">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Falling blocks -->
+  <div class="falling-blocks" aria-hidden="true"></div>
+
+  <!-- Main content -->
+  <div class="container" role="main" aria-label="OptiFrame download section" aria-hidden="true">
+    <h1>OptiFrame</h1>
+    <a 
+      href="https://github.com/bogixxxd/OptiFrame/releases/download/optiframe/OptiFrame.exe" 
+      class="btn-download" 
+      id="downloadBtn" 
+      aria-label="Download OptiFrame" 
+      download
+      >
+      Download
+    </a>
+  </div>
+
+<script>
+  // Floating animation on download button
+  const btn = document.getElementById('downloadBtn');
+  let direction = 1;
+  let pos = 0;
+  setInterval(() => {
+    pos += 0.15 * direction;
+    if (pos > 6 || pos < -6) direction *= -1;
+    btn.style.transform = `translateY(${pos}px) scale(${btn.matches(':active') ? 0.98 : 1})`;
+  }, 30);
+
+  // Create multiple falling blocks with random properties
+  const blocksContainer = document.querySelector('.falling-blocks');
+  const blockCount = 40; // number of blocks
+
+  function randomRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  for(let i=0; i < blockCount; i++) {
+    const block = document.createElement('div');
+    block.classList.add('block');
+
+    // random horizontal start position (vw)
+    block.style.left = `${randomRange(0, 100)}vw`;
+
+    // random animation duration between 7 and 15 seconds
+    const duration = randomRange(7, 15);
+    block.style.animationDuration = `${duration}s`;
+
+    // random delay so they don't all fall simultaneously
+    block.style.animationDelay = `${randomRange(0, 15)}s`;
+
+    // random size variation between 20 and 40 px
+    const size = randomRange(20, 40);
+    block.style.width = `${size}px`;
+    block.style.height = `${size}px`;
+    block.style.borderRadius = `${size / 3}px`;
+
+    // random opacity variation between 0.7 and 1
+    block.style.opacity = randomRange(0.7, 1);
+
+    blocksContainer.appendChild(block);
+  }
+
+  // Handle loader fade out and show content
+  window.addEventListener('load', () => {
+    const loader = document.getElementById('loader');
+    const content = document.querySelector('.container');
+    
+    // Show content after slight delay for demo
+    setTimeout(() => {
+      loader.classList.add('fade-out');
+      content.classList.add('visible');
+      content.setAttribute('aria-hidden', 'false');
+      // Remove loader from DOM after transition
+      setTimeout(() => loader.remove(), 800);
+    }, 3000); // 3 seconds loader delay
+  });
+</script>
+</body>
+</html>
